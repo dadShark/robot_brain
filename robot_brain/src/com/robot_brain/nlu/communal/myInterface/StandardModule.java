@@ -1,4 +1,4 @@
-package com.robot_brain.nlu.myInterface;
+package com.robot_brain.nlu.communal.myInterface;
 
 public interface StandardModule {
     String _main_(String conversationID);//模块的主入口

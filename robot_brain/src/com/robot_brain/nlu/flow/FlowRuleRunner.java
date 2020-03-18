@@ -1,8 +1,8 @@
 package com.robot_brain.nlu.flow;
 
-import com.robot_brain.nlu.bean.ProcessLog;
+import com.robot_brain.nlu.communal.kit.ProcessLog;
 import com.robot_brain.nlu.flow.Verbs.BasisVerbs;
-import com.robot_brain.nlu.kit.StringTool;
+import com.robot_brain.nlu.communal.kit.StringTool;
 
 import java.util.Map;
 
@@ -27,7 +27,7 @@ public class FlowRuleRunner extends ProcessLog {
         } else if (arrayRule.length == 1) {
             actions = arrayRule[0];
         } else {
-            super.setLog("规则格式错误:" + rule);
+            super.setLogInfo("规则格式错误:" + rule);
             return false;
         }
         //条件判断
@@ -79,15 +79,15 @@ public class FlowRuleRunner extends ProcessLog {
                 if (isTrue(attr1, operator, attr2, infoMap)) {
                     continue;
                 }
-                super.setLog(condition + ",条件未达成");
+                super.setLogInfo(condition + ",条件未达成");
                 return false;
             } else {
-                super.setLog("存在异常条件，无法解析：" + condition);
+                super.setLogInfo("存在异常条件，无法解析：" + condition);
                 return false;
             }
         }
         //动作执行
-        super.setLog("执行规则："+rule);
+        super.setLogInfo("执行规则："+rule);
         //解析动作
         String[] arrayActions=actions.split("\\);");
         for(String verb:arrayActions){
@@ -220,6 +220,10 @@ public class FlowRuleRunner extends ProcessLog {
      * @return void
      */
     public  void doVerb(String verbName, String[] arrayParas, Map<String, String> infoMap) {
+        if(arrayParas==null)
+        {
+            arrayParas=new String[]{};
+        }
         if (verbName.equals("应答")) {
             BasisVerbs.answer(arrayParas, infoMap);
         }else if(verbName.equals("信息获取")){

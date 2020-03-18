@@ -1,4 +1,4 @@
-package com.robot_brain.nlu.bean;
+package com.robot_brain.nlu.communal.bean;
 
 import java.util.ArrayList;
 import java.util.Map;

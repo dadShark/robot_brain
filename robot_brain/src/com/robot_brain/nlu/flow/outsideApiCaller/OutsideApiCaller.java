@@ -1,6 +1,6 @@
 package com.robot_brain.nlu.flow.outsideApiCaller;
 
-import com.robot_brain.nlu.myInterface.StandardModule;
+import com.robot_brain.nlu.communal.myInterface.StandardModule;
 
 
 public class OutsideApiCaller implements StandardModule {

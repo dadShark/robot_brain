@@ -25,7 +25,7 @@ public class BasisVerbs {
         String template = arrayParas[0];
         if (template.contains("<@")) {
             Extend extend=new Extend();
-            template=extend.variableSubstitution(template,infoMap);
+            template=extend.variablesReplace(template,infoMap);
         }
         if (infoMap.containsKey("answer")) {
             infoMap.put("answer", infoMap.get("answer") + template);

@@ -1,4 +1,4 @@
-package com.robot_brain.nlu.kit;
+package com.robot_brain.nlu.communal.kit;
 
 import java.util.ArrayList;
 
@@ -36,7 +36,7 @@ public class StringTool {
             }
             return false;
         }
-        return true;
+        return true;//
     }
 
     /*
