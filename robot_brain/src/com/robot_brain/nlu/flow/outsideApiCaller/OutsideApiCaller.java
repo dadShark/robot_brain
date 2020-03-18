@@ -8,6 +8,7 @@ public class OutsideApiCaller implements StandardModule {
         //判断redis中key对应value是否为空，非空则清空redis对应value
 
         //从数据库中查表获取第三方接口配置名，存入javabean结构中
+        //
         //        字段	描述
         //        id	主键
         //        interface_name	接口名称
@@ -18,6 +19,7 @@ public class OutsideApiCaller implements StandardModule {
         //        req_param	请求参数 多个参数名称以,连接
         //        resp_param	响应参数 多个参数名称以,连接
         //        application_id	应用ID
+        //sql: select application_id,invocation_way, function_name, namespace, req_param,resp_param from flow_interface_t where interface_name =?;
         //将结构体转换为json格式存入redis的key下
     }
     /*
