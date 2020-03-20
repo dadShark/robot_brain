@@ -7,7 +7,9 @@ public class OutsideApiInfo {
      * @Author waterkingko
      * @Date 2020年3月19日 00:35:42
      * @Version V1.0
+     * @deprecated  暂时不用该方法
      **/
+
     //        interface_name	接口名称
     //        interface_url	接口地址
     //        invocation_way	调用方式（HTTP，WEBSERVICE）

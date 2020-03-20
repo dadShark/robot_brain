@@ -15,24 +15,23 @@ import java.sql.SQLException;
  * @Version V1.0
  **/
 public class DataBaseUntil {
-/**
+    private static boolean isToMysql;//是否使用MySQL
+
+    /**
  * @description 返回带参数 sql Result
  * @param sql
- * @param obj
  * @return
  * @returnType Result
  */
-    public static Result executedSQL(String sql,Object... obj){
+    public static Result executedSQL(String sql){
         Connection connect = null;
         PreparedStatement parstmt = null;
         ResultSet res = null;
         Result rlt = null;
         //判断使用什么数据库
-        if (getIsUseMemoryDB()) {
-            rlt = getDataBaseCacheResult(sql);
-        }
+
         if (rlt != null)
-            return result;
+            return rlt;
 
         if (isToMysql) {
             MysqlTransfer mt = new MysqlTransfer(sql, null);
@@ -42,7 +41,7 @@ public class DataBaseUntil {
         }
 
         try {
-            connect = getCon();
+            connect = createCon();
             parstmt = connect.createStatement();
             res = parstmt.executeQuery(sql);
             if (res != null) {
@@ -58,9 +57,47 @@ public class DataBaseUntil {
             close(connect);
         }
 
-        if (getIsUseMemoryDB() && null != rlt) {
-            writeDataBaseCache(sql, rlt);
-        }
         return rlt;
     }
+
+    /**
+     * 描述：@description 获取数据库连接
+     * 参数：@return
+     * 返回值类型：@returnType Connection
+     * 创建时间：@dateTime 2020年3月20日 15:30:36
+     * 作者：@author waterkingko
+     */
+    public static Connection createCon() {
+        Connection con = null;
+        String isUsedataPool = GenericUntil
+                .getGlobalProfileInfo("isUsedataPool");
+        if ("".equals(isUsedataPool) || isUsedataPool == null) {
+            return null;
+        } else {
+            if ("yes".equalsIgnoreCase(isUsedataPool)) {// 使用数据库连接池
+                try {
+                    con = dataSource.getConnection();
+                } catch (SQLException e) {
+                    GlobalValue.myLog.error(e);
+                }
+            } else {// 使用数据库普通连接
+                try {
+                    String driver = getCommmonLibJDBCValues("driverClassName"); // 数据库驱动
+                    String url = getCommmonLibJDBCValues("url");// 连接地址
+                    String user = getCommmonLibJDBCValues("username");// 用户名
+                    String password = DESBase64
+                            .decryptStringBase64(getCommmonLibJDBCValues("password"));// 密码
+                    Class.forName(driver); // 加载数据库驱动
+                    con = DriverManager.getConnection(url, user, password);
+                } catch (Exception e) {
+                    GlobalValue.myLog.error("【获取数据库连接异常】", e);
+                    con = null;
+                }
+            }
+        }
+        return con;
+    }
+
+
+
 }
