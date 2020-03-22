@@ -10,10 +10,10 @@ public class OutsideApiDAO {
                     "application_id,interface_name,interface_url,invocation_way," +
                     "function_name,namespace,req_param,resp_param " +
                     "from "+outsiderinfo+"where remove = 0";
-            return DataBaseUntil.executedSQL(sql)
+            return DataBaseUntil.executedSQL(sql);
         }catch(Exception e)
         {
-            GlobalValue.myLog.error("【select】",e);
+            GenericUntil.myLog.error("【select】",e);
             return null;
         }
     }
