@@ -96,9 +96,9 @@ public class DataBaseUntil {
             return null;
         }
         conObject = conObject.replace(" ", "");
-        String jdbcProPath = "jdbc_" + conObject;
+        String jdbckey = key + "_"+ conObject;
         try {
-            return GenericUntil.getXMLInfo(key, jdbcProPath);
+            return GenericUntil.getGlobalProfileInfo(jdbckey);
         } catch (Exception e) {
             myLog.error(e.getMessage());
             return "";

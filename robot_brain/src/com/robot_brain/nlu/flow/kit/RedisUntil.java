@@ -21,6 +21,7 @@ public class RedisUntil {
     }
 
     public static void setOutSideApiReids(String mbusiness, String mApp, String mname, Map<String, String> row) {
+
     }
 
     public static Map<String, String> getOutSideApiRedis(String business, String apps, String names) {

@@ -9,7 +9,7 @@ import java.util.Properties;
 
 public class GenericUntil {
     public static Logger myLog;
-
+    public static String platform = System.getProperty("os.name");
     /**
      * 描述：@description 读取全局配置文件参数
      * 参数：@param key 参数：@return value
@@ -72,7 +72,7 @@ public class GenericUntil {
             // 判定包名是否是简单包名，如果是，则直接将包名转换为路径，
             if (packName.indexOf(".") < 0) {
                 path = packName + "/";
-                System.out.println("packName.indexOf(\".\") < 0");
+                //System.out.println("packName.indexOf(\".\") < 0");
             }
             else {// 否则按照包名的组成部分，将包名转换为路径
                 int start = 0, end = 0;
@@ -116,23 +116,21 @@ public class GenericUntil {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        /*if (GlobalValue.platform.contains("Linux")) {
+        if (GenericUntil.platform.contains("Linux")) {
             realPath = realPath + "/" + fileName + ".xml";
         } else {
             if (realPath.endsWith("bin")) {
                 realPath = realPath.replace("bin", "src");
             }
-            realPath = realPath.substring(1, realPath.length()) + "/" + fileName
+            realPath = realPath/*.substring(1, realPath.length())*/ + "/" + fileName
                     + ".xml";
         }
-         */
 
+        //realPath = realPath+
         return realPath;
     }
 
-    public static String getGlobalInfo(String connectFrom) {
-        return null;
-    }
+
 
     public static void error(String s) {
 

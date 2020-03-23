@@ -20,8 +20,7 @@ public class GenericUntilTest {
     public void getXMLInfo() {
         String str = GenericUntil.getXMLInfo("connectFrom","GlobalDeploy");
         System.out.println(str);
-        File f = new File(this.getClass().getResource("/").getPath());
-        System.out.println(f);
+
 
     }
 
