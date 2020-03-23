@@ -25,8 +25,8 @@ public class GenericUntil {
      *
      *描述：从xml文件中读取配置
      *
-     * @author: qianlei
-     *@date： 日期：2019-9-4 时间：上午09:45:10
+     * @author: waterkingko
+     *@date： 日期：2020年3月23日 21:53:30
      *@param node
      *@param fileName
      *@return
@@ -119,8 +119,8 @@ public class GenericUntil {
         return realPath;
     }
 
-    public static String getCommmonLibGlobalValues(String connectFrom) {
-
+    public static String getGlobalInfo(String connectFrom) {
+        return null;
     }
 
     public static void error(String s) {

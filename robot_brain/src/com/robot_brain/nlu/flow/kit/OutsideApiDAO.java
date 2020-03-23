@@ -4,6 +4,10 @@ import javax.servlet.jsp.jstl.sql.Result;
 
 public class OutsideApiDAO {
 
+    /**
+     * @param outsiderinfo
+     * @return Result
+     */
     public static Result select(String outsiderinfo){
         try{
             String sql = "select " +

@@ -20,11 +20,7 @@ import static com.robot_brain.nlu.flow.kit.GenericUntil.myLog;
  * @Version V1.0
  **/
 public class DataBaseUntil {
-    /**
-     * 定义全局 dataSource
-     */
-    private static DataSource dataSource;
-    private static boolean isToMysql;//是否使用MySQL
+
 
     /**
  * @description 返回带参数 sql Result
@@ -41,13 +37,6 @@ public class DataBaseUntil {
 
         if (rlt != null)
             return rlt;
-//        /
-//        if (isToMysql) {
-//            MysqlTransfer mt = new MysqlTransfer(sql, null);
-//            mt.transfer();
-//            sql = mt.getMysqlSql();
-//            //GlobalValue.myLog.debug(mt.toString());
-//        }
 
         try {
             connect = createCon();
@@ -80,52 +69,35 @@ public class DataBaseUntil {
      */
     public static Connection createCon() {
         Connection con = null;
-        String isUsedataPool = GenericUntil
-                .getGlobalProfileInfo("isUsedataPool");
-        if ("".equals(isUsedataPool) || isUsedataPool == null) {
-            return null;
-        } else {
-            if ("yes".equalsIgnoreCase(isUsedataPool)) {// 使用数据库连接池
-                try {
-                    con = dataSource.getConnection();
-                } catch (SQLException e) {
-                    //GlobalValue.myLog.error(e);
-                }
-            } else {// 使用数据库普通连接
-                try {
-                    String driver = getGlobalDeployJDBCValues("driverClassName"); // 数据库驱动
-                    String url = getGlobalDeployJDBCValues("url");// 连接地址
-                    String user = getGlobalDeployJDBCValues("username");// 用户名
-                    String password = DataEncryption
-                            .decryptStringBase64(getGlobalDeployJDBCValues("password"));// 密码
-                    Class.forName(driver); // 加载数据库驱动
-                    con = DriverManager.getConnection(url, user, password);
-                } catch (Exception e) {
-                    myLog.error("【获取数据库连接异常】", e);
-                    con = null;
-                }
-            }
+        try {
+            String driver = getGlobalDeployJDBCValues("driverClassName"); // 数据库驱动
+            String url = getGlobalDeployJDBCValues("url");// 连接地址
+            String user = getGlobalDeployJDBCValues("username");// 用户名
+            String password = getGlobalDeployJDBCValues("password");// 密码
+            Class.forName(driver); // 加载数据库驱动
+            con = DriverManager.getConnection(url, user, password);
+        } catch (Exception e) {
+            con = null;
         }
         return con;
     }
 
     /**
-     * 描述：@description 读取jdbc参数 参数：@param key 参数：@return value 返回值类型：@returnType
-     * String 创建时间：@dateTime 2015-9-21下午01:44:52 作者：@author wellhan
+     * 描述：@description 读取jdbc参数
+     * 参数：@param key
+     * 参数：@return value
+     * 返回值类型：@returnType String
+     * 创建时间：@dateTime 2015-9-21下午01:44:52
+     * 作者：@author waterkingko
      */
     public static String getGlobalDeployJDBCValues(String key) {
-        String conObject = GenericUntil.getCommmonLibGlobalValues("connectFrom");
+        String conObject = GenericUntil.getGlobalProfileInfo("connectFrom");
         if ("".equals(conObject) || conObject == null) {
             return null;
         }
         conObject = conObject.replace(" ", "");
-        if (isToMysql)
-            conObject = "mysql";
         String jdbcProPath = "jdbc_" + conObject;
         try {
-            // ResourceBundle resourcesTable = ResourceBundle
-            // .getBundle(jdbcProPath);
-            // return resourcesTable.getString(key);
             return GenericUntil.getXMLInfo(key, jdbcProPath);
         } catch (Exception e) {
             myLog.error(e.getMessage());
@@ -153,7 +125,7 @@ public class DataBaseUntil {
                 stmt.close();
         } catch (Exception ex) {
             // 写异常日志
-            myLog.error(ex);
+            GenericUntil.myLog.error("关闭连接异常信息==>", ex);
         }
     }
 

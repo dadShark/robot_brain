@@ -17,7 +17,7 @@ import java.util.SortedMap;
 public class OutsideApiCaller implements StandardModule {
     public void _init_() {
         //思路:查出答案之后直接将答案往redis中存。每次存之前清空对应KEY下的内容。
-        Result dt;
+        Result dt = null;
         try {
             dt = OutsideApiDAO.select("flow_interface_t");//第三方接口信息配制
             if (dt == null) {
@@ -27,27 +27,14 @@ public class OutsideApiCaller implements StandardModule {
         } catch (Exception e) {
             GenericUntil.myLog.error("(第三方接口信息配制)中获取接口参数输出配制表信息为空！！！");
         }
-        for (Map<String, String> row : dt.getRows()) {
-            String mbusiness = row.get("mbusiness").toString().trim();
-            String mApp = row.get("mApp").toString().trim();
-            String mname = row.get("mname").toString().trim();
-            RedisUntil.setOutSideApiReids(mbusiness, mApp, mname, row);
-            /*数据存储格式
-                {
-                    key: "商家",
-                    value: {
-                        key: "应用",
-                        value: {
-                            key: "第三方接口信息",
-                            value: {
-                                a:"",
-                                b:"",
-                                c:""
-                            }
-                        }
-                    },
-                }
-             */
+        if (dt != null){
+            for (Map<String, String> row : dt.getRows()) {
+                String mbusiness = row.get("mbusiness").toString().trim();
+                String mApp = row.get("mApp").toString().trim();
+                String mname = row.get("mname").toString().trim();
+                RedisUntil.setOutSideApiReids(mbusiness, mApp, mname, row);
+
+            }
         }
     }
 
@@ -75,12 +62,14 @@ public class OutsideApiCaller implements StandardModule {
         }
         //根据第三方配置名从redis中将json串取出到map中
         //判断map中元素invocation_way判断使用哪种解析接口方式HTTP，WEBSERVICE
-        return null;
+       return result;
     }
 
     private String useWebService(Map<String, String> maps) {
+        return null;
     }
 
     private String useHTTP(Map<String, String> maps) {
+        return null;
     }
 }
