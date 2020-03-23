@@ -1,5 +1,6 @@
 package com.robot_brain.nlu.flow.kit;
 
+import com.robot_brain.nlu.flow.outsideApiCaller.OutsideApiCaller;
 import jdk.internal.instrumentation.Logger;
 
 import java.io.FileInputStream;
@@ -33,7 +34,7 @@ public class GenericUntil {
      *@throws Exception
      */
     public static String getXMLInfo(String node, String fileName) {
-        String path = getAppPath(GenericUntil.class, fileName);
+        String path = getAppPath(OutsideApiCaller.class, fileName);
         Properties props = new Properties();
 
         try {
@@ -45,6 +46,7 @@ public class GenericUntil {
             return props.getProperty(node);
         } catch (Exception e) {
             //GlobalValue.myLog.error("【" + fileName + "配置缺失】" + node, e);
+            System.out.println("【" + fileName + "配置缺失】" + node +"path:"+path);
             return "";
         }
     }
@@ -68,8 +70,10 @@ public class GenericUntil {
             // 在类的名称中，去掉包名的部分，获得类的文件名
             clsName = clsName.substring(packName.length() + 1);
             // 判定包名是否是简单包名，如果是，则直接将包名转换为路径，
-            if (packName.indexOf(".") < 0)
+            if (packName.indexOf(".") < 0) {
                 path = packName + "/";
+                System.out.println("packName.indexOf(\".\") < 0");
+            }
             else {// 否则按照包名的组成部分，将包名转换为路径
                 int start = 0, end = 0;
                 end = packName.indexOf(".");
@@ -87,14 +91,19 @@ public class GenericUntil {
         String realPath = url.getPath();
         // 去掉路径信息中的协议名"file:"
         int pos = realPath.indexOf("file:");
-        if (pos > -1)
+        if (pos > -1){
             realPath = realPath.substring(pos + 5);
+            System.out.println("realPath = realPath.substring(pos + 5);");
+        }
         // 去掉路径信息最后包含类文件信息的部分，得到类所在的路径
         pos = realPath.indexOf(path + clsName);
         realPath = realPath.substring(0, pos - 1);
+
         // 如果类文件被打包到JAR等文件中时，去掉对应的JAR等打包文件名
-        if (realPath.endsWith("!"))
+        if (realPath.endsWith("!")) {
             realPath = realPath.substring(0, realPath.lastIndexOf("/"));
+            System.out.println("realPath = realPath.substring(0, realPath.lastIndexOf(\"/\"));");
+        }
 		/*------------------------------------------------------------
 		 ClassLoader的getResource方法使用了utf-8对路径信息进行了编码，当路径
 		  中存在中文和空格时，他会对这些字符进行转换，这样，得到的往往不是我们想要
@@ -103,6 +112,7 @@ public class GenericUntil {
 		-------------------------------------------------------------*/
         try {
             realPath = java.net.URLDecoder.decode(realPath, "utf-8");
+            System.out.println("realPath = java.net.URLDecoder.decode(realPath, \"utf-8\");");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -116,6 +126,7 @@ public class GenericUntil {
                     + ".xml";
         }
          */
+
         return realPath;
     }
 
