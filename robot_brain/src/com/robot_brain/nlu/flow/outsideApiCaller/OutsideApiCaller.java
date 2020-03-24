@@ -1,5 +1,7 @@
 package com.robot_brain.nlu.flow.outsideApiCaller;
 
+
+import net.sf.json.JSONObject;
 import com.robot_brain.nlu.communal.myInterface.StandardModule;
 import com.robot_brain.nlu.flow.bean.OutsideApiInfo;
 import com.robot_brain.nlu.flow.kit.GenericUntil;
@@ -29,26 +31,28 @@ public class OutsideApiCaller implements StandardModule {
         }
         if (dt != null){
             for (Map<String, String> row : dt.getRows()) {
+                OutsideApiInfo apiInfo =new OutsideApiInfo();
                 String mbusiness = row.get("mbusiness").toString().trim();
                 String mApp = row.get("mApp").toString().trim();
                 String mname = row.get("mname").toString().trim();
-                RedisUntil.setOutSideApiReids(mbusiness, mApp, mname, row);
+                apiInfo.setBusiness(mbusiness);
+                JSONObject jsonObject =JSONObject.fromObject(apiInfo);
+                Map<String,JSONObject> redismap = null;
+                String mkey = mbusiness+mApp+"::"+mname;
+                redismap.put(mkey,jsonObject);
+                RedisUntil.setOutSideApiReids(redismap);
 
             }
         }
     }
-
     /*
-    *
-    *
-    *
      */
     public String _main_(String business,String apps,String names) {
         String result= null;
         //从redis中获取数据
-
+        String key =null;
         Map<String,String> maps = null;
-        maps = RedisUntil.getOutSideApiRedis(business,apps,names);
+        maps = RedisUntil.getOutSideApiRedis(key);
         //根据
         if (result ==null&&maps.containsKey("请求方式")){
             if (maps.get("请求方式") == "HTTP"){

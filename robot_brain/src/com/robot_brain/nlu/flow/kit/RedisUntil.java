@@ -1,5 +1,7 @@
 package com.robot_brain.nlu.flow.kit;
 
+import net.sf.json.JSON;
+import net.sf.json.JSONObject;
 import redis.clients.jedis.Jedis;
 
 import java.util.Map;
@@ -9,7 +11,7 @@ public class RedisUntil {
 
 
 
-    public static void setReids(String busniess, String apps, String names, Map maps){
+    public static void setReids(Map<String, JSON> map){
 
 
     }
@@ -20,12 +22,13 @@ public class RedisUntil {
         System.out.println("服务正在运行"+jedis.ping());
     }
 
-    public static void setOutSideApiReids(String mbusiness, String mApp, String mname, Map<String, String> row) {
+    public static void setOutSideApiReids(Map<String, JSONObject> map) {
 
     }
 
-    public static Map<String, String> getOutSideApiRedis(String business, String apps, String names) {
-        Map<String,String> maps =null;
-        return maps;
+    public static Map<String, String> getOutSideApiRedis(String key) {
+
+
+        return null;
     }
 }
