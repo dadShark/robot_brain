@@ -11,9 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import redis.clients.jedis.Jedis;
 
 import javax.servlet.jsp.jstl.sql.Result;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.SortedMap;
+import java.util.*;
 
 
 public class OutsideApiCaller implements StandardModule {
@@ -32,13 +30,38 @@ public class OutsideApiCaller implements StandardModule {
         if (dt != null){
             for (Map<String, String> row : dt.getRows()) {
                 OutsideApiInfo apiInfo =new OutsideApiInfo();
-                String mbusiness = row.get("mbusiness").toString().trim();
-                String mApp = row.get("mApp").toString().trim();
-                String mname = row.get("mname").toString().trim();
+                String mbusiness = row.get("Business").toString().trim();//商家
+                String minterface = row.get("InterfaceName").toString().trim();//接口名称
+                String maddress = row.get("InterfaceAddress").toString().trim();//接口地址
+                String mcallmethod = row.get("CallingMethod").toString().trim();//调用方式（HTTP，WEBSERVICE）
+                String mrequestmethod = row.get("RequestMethod").toString().trim();//调用方式（HTTP，WEBSERVICE）
+                String mnamespace = row.get("NameSpace").toString().trim();//命名空间 调用方式为webservice时填写
+                String mrequestvalue = row.get("ParseRequestValue").toString().trim();//请求参数 多个参数名称以,连接
+                String mreponsevalue = row.get("ResponseParameter").toString().trim();//响应参数 多个参数名称以,连接
+                String mid = row.get("ApplicationID").toString().trim();//应用ID
+                List mrequestlist;
+                List mreponselist;
+                if (mrequestvalue!= null && mrequestvalue!=""){
+                    mrequestlist=Arrays.asList(mrequestvalue.split(","));
+                }else{
+                    mrequestlist= null;
+                }
+                if (mreponsevalue != null && !mreponsevalue.equals(",")){
+                    mreponselist = Arrays.asList(mreponsevalue.split(","));
+                }else{
+                    mreponselist= null;
+                }
+                apiInfo.setInterfaceAddress(maddress);
+                apiInfo.setCallingMethod(mcallmethod);
+                apiInfo.setRequestMethod(mrequestmethod);
+                apiInfo.setNameSpace(mnamespace);
+                apiInfo.setParseRequestValue(mrequestlist);
+                apiInfo.setResponseParameter(mreponselist);
                 apiInfo.setBusiness(mbusiness);
+                apiInfo.setApplicationID(mid);
                 JSONObject jsonObject =JSONObject.fromObject(apiInfo);
                 Map<String,JSONObject> redismap = null;
-                String mkey = mbusiness+mApp+"::"+mname;
+                String mkey = mbusiness+"::"+minterface;
                 redismap.put(mkey,jsonObject);
                 RedisUntil.setOutSideApiReids(redismap);
 

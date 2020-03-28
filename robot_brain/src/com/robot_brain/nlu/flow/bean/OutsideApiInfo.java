@@ -1,5 +1,12 @@
 package com.robot_brain.nlu.flow.bean;
 
+import com.sun.xml.internal.bind.v2.runtime.reflect.Lister;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+
 public class OutsideApiInfo {
 
 
@@ -9,116 +16,116 @@ public class OutsideApiInfo {
      * @Author waterkingko
      * @Date 2020年3月19日 00:35:42
      * @Version V1.0
-     * @deprecated  暂时不用该方法
+     * @deprecated 暂时不用该方法
      **/
-    private String interface_name;//接口信息名
-    private String business;//商家
-    private String Apiurl;//地址
-    private String invocation_way;
-    private String function_name;
-    private String namespace;
-    private String req_param;
-    private String resp_param;
-    private String application_id;
+    private String InterfaceName;//接口名称
+    private String Business;//商家
+    private String InterfaceAddress;//接口地址
+    private String CallingMethod;//调用方式（HTTP，WEBSERVICE）
+    private String RequestMethod;//（调用方式为http时，为GET、POST；调用方式为webservice时，为函数名称）
+    private String NameSpace;//命名空间 调用方式为webservice时填写
+    private List ParseRequestValue;//请求参数 多个参数名称以,连接
+    private List ResponseParameter;//响应参数 多个参数名称以,连接
+    private String ApplicationID;//应用ID
 
-    public OutsideApiInfo(){
-        interface_name = "";
-        business = "";
-        req_param = "";
-        resp_param = "";
-        function_name = "";
+    public OutsideApiInfo() {
+        InterfaceName = "";
+        Business = "";
+        ParseRequestValue = new LinkedList();
+        ResponseParameter = new LinkedList();
+        RequestMethod = "";
     }
 
-    public OutsideApiInfo(OutsideApiInfo apiInfo ){
+    public OutsideApiInfo(OutsideApiInfo apiInfo) {
         if (apiInfo == null) {
             return;
         }
-        try{
-            this.interface_name =apiInfo.interface_name;
-            this.Apiurl=apiInfo.Apiurl;
-            this.business=apiInfo.business;
-            this.function_name =apiInfo.function_name;
-            this.invocation_way =apiInfo.invocation_way;
-            this.namespace = apiInfo.namespace;
-            this.req_param=apiInfo.req_param;
-            this.resp_param=apiInfo.resp_param;
-            this.application_id=apiInfo.application_id;
+        try {
+            this.InterfaceName = apiInfo.InterfaceName;
+            this.InterfaceAddress = apiInfo.InterfaceAddress;
+            this.Business = apiInfo.Business;
+            this.RequestMethod = apiInfo.RequestMethod;
+            this.CallingMethod = apiInfo.CallingMethod;
+            this.NameSpace = apiInfo.NameSpace;
+            this.ParseRequestValue = apiInfo.ParseRequestValue;
+            this.ResponseParameter = apiInfo.ResponseParameter;
+            this.ApplicationID = apiInfo.ApplicationID;
 
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println("获取第三方接口配置出错");
         }
     }
 
-    public String getInterface_name() {
-        return interface_name;
+    public String getInterfaceName() {
+        return InterfaceName;
     }
 
-    public void setInterface_name(String interface_name) {
-        this.interface_name = interface_name;
+    public void setInterfaceName(String interfaceName) {
+        this.InterfaceName = interfaceName;
     }
 
     public String getBusiness() {
-        return business;
+        return Business;
     }
 
     public void setBusiness(String business) {
-        this.business = business;
+        this.Business = business;
     }
 
-    public String getApiurl() {
-        return Apiurl;
+    public String getInterfaceAddress() {
+        return InterfaceAddress;
     }
 
-    public void setApiurl(String apiurl) {
-        Apiurl = apiurl;
+    public void setInterfaceAddress(String interfaceAddress) {
+        InterfaceAddress = interfaceAddress;
     }
 
-    public String getInvocation_way() {
-        return invocation_way;
+    public String getCallingMethod() {
+        return CallingMethod;
     }
 
-    public void setInvocation_way(String invocation_way) {
-        this.invocation_way = invocation_way;
+    public void setCallingMethod(String callingMethod) {
+        this.CallingMethod = callingMethod;
     }
 
-    public String getFunction_name() {
-        return function_name;
+    public String getRequestMethod() {
+        return RequestMethod;
     }
 
-    public void setFunction_name(String function_name) {
-        this.function_name = function_name;
+    public void setRequestMethod(String requestMethod) {
+        this.RequestMethod = requestMethod;
     }
 
-    public String getNamespace() {
-        return namespace;
+    public String getNameSpace() {
+        return NameSpace;
     }
 
-    public void setNamespace(String namespace) {
-        this.namespace = namespace;
+    public void setNameSpace(String nameSpace) {
+        this.NameSpace = nameSpace;
     }
 
-    public String getReq_param() {
-        return req_param;
+    public List getParseRequestValue() {
+        return ParseRequestValue;
     }
 
-    public void setReq_param(String req_param) {
-        this.req_param = req_param;
+    public void setParseRequestValue(List parseRequestValue) {
+        this.ParseRequestValue = parseRequestValue;
     }
 
-    public String getResp_param() {
-        return resp_param;
+    public List getResponseParameter() {
+        return ResponseParameter;
     }
 
-    public void setResp_param(String resp_param) {
-        this.resp_param = resp_param;
+    public void setResponseParameter(List responseParameter) {
+        this.ResponseParameter = responseParameter;
     }
 
-    public String getApplication_id() {
-        return application_id;
+    public String getApplicationID() {
+        return ApplicationID;
     }
 
-    public void setApplication_id(String application_id) {
-        this.application_id = application_id;
+    public void setApplicationID(String applicationID) {
+        this.ApplicationID = applicationID;
     }
 /*       key:测试行业->测试商家->测试应用::测试接口
             value:
@@ -141,5 +148,6 @@ public class OutsideApiInfo {
         ]
             }
      */
+
 
 }

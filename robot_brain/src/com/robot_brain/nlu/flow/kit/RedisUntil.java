@@ -9,7 +9,10 @@ import java.util.Map;
 public class RedisUntil {
     //redis操作类
 
-
+    public static void jedisCon(){
+        String jedishost =GenericUntil.getGlobalProfileInfo("redisurl");
+        Jedis jedis =new Jedis(jedishost);
+    }
 
     public static void setReids(Map<String, JSON> map){
 
@@ -23,6 +26,7 @@ public class RedisUntil {
     }
 
     public static void setOutSideApiReids(Map<String, JSONObject> map) {
+        jedisCon();
 
     }
 
