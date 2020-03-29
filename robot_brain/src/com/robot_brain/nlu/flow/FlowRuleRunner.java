@@ -3,6 +3,7 @@ package com.robot_brain.nlu.flow;
 import com.robot_brain.nlu.communal.kit.ProcessLog;
 import com.robot_brain.nlu.flow.Verbs.BasisVerbs;
 import com.robot_brain.nlu.communal.kit.StringTool;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
@@ -16,7 +17,7 @@ import java.util.Map;
  **/
 public class FlowRuleRunner extends ProcessLog {
 
-    public Boolean runRule(String rule, Map<String, String> infoMap) {
+    public Boolean runRule(@NotNull String rule, Map<String, String> infoMap) {
         //规则解析
         String conditions = "";
         String actions;
@@ -219,7 +220,7 @@ public class FlowRuleRunner extends ProcessLog {
      * @params [verbName, arrayParas, infoMap]
      * @return void
      */
-    public  void doVerb(String verbName, String[] arrayParas, Map<String, String> infoMap) {
+    private void doVerb(String verbName, String[] arrayParas, Map<String, String> infoMap) {
         if(arrayParas==null)
         {
             arrayParas=new String[]{};

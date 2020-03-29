@@ -1,5 +1,7 @@
 package com.robot_brain.nlu.flow.Verbs;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Map;
 
 /**
@@ -41,7 +43,7 @@ public class BasisVerbs {
      * @params [arrayParas, infoMap]
      * @return void
      */
-    public static void informationRetrieval(String[] arrayParas, Map<String, String> infoMap) {
+    public static void informationRetrieval(@NotNull String[] arrayParas, Map<String, String> infoMap) {
         if(arrayParas.length==0){
             return;
         }
