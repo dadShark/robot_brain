@@ -1,6 +1,7 @@
 package com.robot_brain.nlu.flow.outsideApiCaller;
 
 
+import com.alibaba.fastjson.JSON;
 import net.sf.json.JSONObject;
 import com.robot_brain.nlu.communal.myInterface.StandardModule;
 import com.robot_brain.nlu.flow.bean.OutsideApiInfo;
@@ -18,6 +19,7 @@ public class OutsideApiCaller implements StandardModule {
     public void _init_() {
         //思路:查出答案之后直接将答案往redis中存。每次存之前清空对应KEY下的内容。
         Result dt = null;
+        Map<String, String> redismap = null;
         try {
             dt = OutsideApiDAO.select("flow_interface_t");//第三方接口信息配制
             if (dt == null) {
@@ -27,9 +29,9 @@ public class OutsideApiCaller implements StandardModule {
         } catch (Exception e) {
             GenericUntil.myLog.error("(第三方接口信息配制)中获取接口参数输出配制表信息为空！！！");
         }
-        if (dt != null){
+        if (dt != null) {
             for (Map<String, String> row : dt.getRows()) {
-                OutsideApiInfo apiInfo =new OutsideApiInfo();
+                OutsideApiInfo apiInfo = new OutsideApiInfo();
                 String mbusiness = row.get("Business").toString().trim();//商家
                 String minterface = row.get("InterfaceName").toString().trim();//接口名称
                 String maddress = row.get("InterfaceAddress").toString().trim();//接口地址
@@ -41,15 +43,15 @@ public class OutsideApiCaller implements StandardModule {
                 String mid = row.get("ApplicationID").toString().trim();//应用ID
                 List mrequestlist;
                 List mreponselist;
-                if (mrequestvalue!= null && mrequestvalue!=""){
-                    mrequestlist=Arrays.asList(mrequestvalue.split(","));
-                }else{
-                    mrequestlist= null;
+                if (mrequestvalue != null && mrequestvalue != "") {
+                    mrequestlist = Arrays.asList(mrequestvalue.split(","));
+                } else {
+                    mrequestlist = null;
                 }
-                if (mreponsevalue != null && !mreponsevalue.equals(",")){
+                if (mreponsevalue != null && !mreponsevalue.equals(",")) {
                     mreponselist = Arrays.asList(mreponsevalue.split(","));
-                }else{
-                    mreponselist= null;
+                } else {
+                    mreponselist = null;
                 }
                 apiInfo.setInterfaceAddress(maddress);
                 apiInfo.setCallingMethod(mcallmethod);
@@ -59,31 +61,40 @@ public class OutsideApiCaller implements StandardModule {
                 apiInfo.setResponseParameter(mreponselist);
                 apiInfo.setBusiness(mbusiness);
                 apiInfo.setApplicationID(mid);
-                JSONObject jsonObject =JSONObject.fromObject(apiInfo);
-                Map<String,JSONObject> redismap = null;
-                String mkey = mbusiness+"::"+minterface;
-                redismap.put(mkey,jsonObject);
-                RedisUntil.setOutSideApiReids(redismap);
+                String jsonObject = JSONObject.fromObject(apiInfo).toString();
+
+                String mkey = mbusiness + "::" + minterface;
+                redismap.put(mkey, jsonObject);
 
             }
+            try {
+                RedisUntil.setOutSideApiReids(redismap);
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.out.println("redis存入第三方接口失败");
+            }
+
         }
     }
     /*
      */
-    public String _main_(String business,String apps,String names) {
+    public String _main_(String outsideApiName) {
         String result= null;
-        //从redis中获取数据
-        String key =null;
         Map<String,String> maps = null;
-        maps = RedisUntil.getOutSideApiRedis(key);
-        //根据
-        if (result ==null&&maps.containsKey("请求方式")){
-            if (maps.get("请求方式") == "HTTP"){
-                result = useHTTP(maps);
+        String mkey ="config:outsidApiInfo";
+        //从redis中获取数据
+        String business =GenericUntil.getGlobalProfileInfo("business");
+        String keys = business+"::"+outsideApiName;
+        maps = RedisUntil.getOutSideApiRedis(mkey);
+        //从第三方接口表中查到对应接口
+        Map outsideApiMaps = JSON.parseObject(maps.getOrDefault(outsideApiName,null));
+        if (result ==null&&outsideApiMaps.containsKey("请求方式")){
+            if (outsideApiMaps.get("请求方式") == "HTTP"){
+                result = useHTTP(outsideApiMaps);
                 return result;
             }
-            if (maps.get("请求方式") == "webservice"){
-                useWebService(maps);
+            if (outsideApiMaps.get("请求方式") == "webservice"){
+                useWebService(outsideApiMaps);
                 return result;
             }
         }
