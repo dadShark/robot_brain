@@ -1,9 +1,10 @@
 package com.robot_brain.nlu.flow;
 
 import com.robot_brain.nlu.communal.kit.ProcessLog;
-import com.robot_brain.nlu.flow.Verbs.BasisVerbs;
 import com.robot_brain.nlu.communal.kit.StringTool;
+import com.robot_brain.nlu.flow.Verbs.BasisVerbs;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 /**
@@ -16,7 +17,7 @@ import java.util.Map;
  **/
 public class FlowRuleRunner extends ProcessLog {
 
-    public Boolean runRule(String rule, Map<String, String> infoMap) {
+    public Boolean runRule(String rule, Map<String,String> infoMap) {
         //规则解析
         String conditions = "";
         String actions;
@@ -75,57 +76,108 @@ public class FlowRuleRunner extends ProcessLog {
             if (tag != -1) {
                 String attr1 = condition.substring(0, tag).trim();
                 String attr2 = condition.substring(tag + operator.length()).trim();
+                //去除条件值中的双引号，不用做判断值类型（字符串或数值）的依据
+                attr2=attr2.replace("\"","");
                 //进行条件判断
                 if (isTrue(attr1, operator, attr2, infoMap)) {
                     continue;
                 }
-                super.setLogInfo(condition + ",条件未达成");
-                return false;
+                super.setLogDebug(condition + ",条件未达成");
             } else {
                 super.setLogInfo("存在异常条件，无法解析：" + condition);
-                return false;
             }
+            return false;
         }
+
         //动作执行
         super.setLogInfo("执行规则："+rule);
         //解析动作
-        String[] arrayActions=actions.split("\\);");
-        for(String verb:arrayActions){
-            int tag=verb.indexOf("(");
-            String verbName;//动作名称
-            String[] arrayParas;//执行参数
-            if(tag==-1){
+        ArrayList<String> actionsList=new ArrayList<>();
+        if (actions.contains(");")) {
+            // 用字符位置进行字符串切割
+            int length = actions.length();
+            int start = 0;
+            while (start < length) {
+                int end = actions.indexOf(");", start);
+                if (end == -1) {
+                    // 不存在");"则将剩下的整个字符串存入
+                    end = length;
+                } else {
+                    // 后移一位，将")"算进去
+                    end = end + 1;
+                }
+                actionsList.add(actions.substring(start, end));
+                // 下次的开始是本次切割的末尾+1位置，用于去除";"
+                start = end + 1;
+            }
+        } else {
+            actionsList.add(actions.trim());
+        }
+        for(String verb:actionsList){
+            int front=verb.indexOf("(");
+            int last=verb.lastIndexOf(")");
+            //动作名称
+            String verbName;
+            //执行参数
+            String[] arrayParas;
+            if(front==-1){
                 //默认缺省的动作名称为"应答"
                 verbName="应答";
                 arrayParas=new String[]{verb};
-            }else{
-                verbName=verb.substring(0,tag);
-                arrayParas=verb.substring(tag+1).split("\",");
+            }else {
+                verbName = verb.substring(0, front).trim();
+                arrayParas = verb.substring(front + 1, last).trim().split("\",\"");
             }
+            int length=arrayParas.length;
+            if(length>0){
+                //去除前后遗留的引号
+                arrayParas[0]=StringTool.trimCharacter(arrayParas[0],'\"');
+                arrayParas[length-1]=StringTool.trimCharacter(arrayParas[length-1],'\"');
+            }
+            String answer=infoMap.getOrDefault("answer","");
             doVerb(verbName,arrayParas,infoMap);
+            if(answer.length()>0 && !answer.equals(infoMap.getOrDefault("answer",""))){
+                //当同一条规则的多组动作对答案进行操作时，默认直接进行答案拼接
+                infoMap.put("answer",answer+infoMap.getOrDefault("answer",""));
+            }
         }
         return true;
     }
 
-    private Boolean isTrue(String attr1, String operator, String attr2, Map<String, String> infoMap) {
+    /*
+     * create by: shark
+     * description: 判断条件是否成立
+     * create time: 2020/3/23 9:16
+     * @params [attr1, operator, attr2, infoMap]
+     * @return java.lang.Boolean
+     */
+    private Boolean isTrue(String attr1, String operator, String attr2, Map<String,String> infoMap) {
         String[] arrayAttr2;
         if (attr2.contains("||")) {
-            arrayAttr2 = attr2.split("\\|\\|");//多个值视为or的关系，一个为true，整个表达式为true
+            //多个值视为or的关系，一个为true，整个表达式为true
+            arrayAttr2 = attr2.split("\\|\\|");
         } else {
             arrayAttr2 = new String[]{attr2};
         }
         for (String strSetAttr2 : arrayAttr2) {
-            boolean isNum = false;//当前值是否为数值，默认当作字符串类型解析
-            double dbCurAttr2 = -1;//当前值（数值类型），isNum为true时启用。
-            String strCurAttr2 = "";//当前值（字符串类型）
-            double dbSetAttr2 = -1;//设定值(数值类型)
+            //当前值是否为数值，默认当作字符串类型解析
+            boolean isNum = false;
+            //当前值（数值类型），isNum为true时启用。
+            double dbCurAttr2 = -1;
+            //当前值（字符串类型）
+            String strCurAttr2 = "";
+            //设定值(数值类型)
+            double dbSetAttr2 = -1;
             if (attr1.contains("%") || attr1.contains("/")) {
                 //attr1可能是除法算式,需要先计算其结果，再进行比较。如：交互回合数%3=0
                 int tag1 = attr1.indexOf("%");
                 int tag2 = attr1.indexOf("/");
-                String tmp = "";//除数
-                String value = "";//被除数
-                String op = "";//运算符
+                //除数
+                String tmp = "";
+                //被除数
+                String value = "";
+                //运算符
+                String op = "";
                 if (tag1 != -1) {
                     tmp = attr1.substring(0, tag1);
                     value = attr1.substring(tag1 + 1);
@@ -136,7 +188,7 @@ public class FlowRuleRunner extends ProcessLog {
                     op = "/";
                 }
                 if (infoMap.containsKey(tmp)) {
-                    tmp = infoMap.get(tmp);
+                    tmp = infoMap.getOrDefault(tmp,"");
                 }
                 if (StringTool.isArabicNumerals(tmp) && StringTool.isArabicNumerals(value) && StringTool.isArabicNumerals(attr2)) {
                     if (op.equals("%")) {
@@ -154,11 +206,12 @@ public class FlowRuleRunner extends ProcessLog {
             if (!isNum) {
                 //attr1非算式的情况，需要从infoMap中取值，并判断此次是数值运算还是字符运算
                 if (infoMap.containsKey(attr1)) {
-                    strCurAttr2 = infoMap.get(attr1);//当前值获取完毕，默认是String
+                    //当前值获取完毕，默认是String
+                    strCurAttr2 = infoMap.getOrDefault(attr1,"");
                 }
                 if (strSetAttr2.startsWith("@") && infoMap.containsKey(strSetAttr2)) {
                     //出发地=@目的地
-                    strSetAttr2 = infoMap.get(strSetAttr2);
+                    strSetAttr2 = infoMap.getOrDefault(strSetAttr2,"");
                 }
                 if (StringTool.isArabicNumerals(strCurAttr2) && StringTool.isArabicNumerals(strSetAttr2)) {
                     //如果设定值和当前值都是数值，则此次是数值运算
@@ -168,42 +221,52 @@ public class FlowRuleRunner extends ProcessLog {
                 }
             }
             if (isNum) {
-                if (operator.equals("=")) {
-                    if (dbCurAttr2 == dbSetAttr2) {
-                        return true;
-                    }
-                } else if (operator.equals("!=")) {
-                    if (dbCurAttr2 != dbSetAttr2) {
-                        return true;
-                    }
-                } else if (operator.equals("<=")) {
-                    if (dbCurAttr2 <= dbSetAttr2) {
-                        return true;
-                    }
-                } else if (operator.equals("<")) {
-                    if (dbCurAttr2 < dbSetAttr2) {
-                        return true;
-                    }
-                } else if (operator.equals(">=")) {
-                    if (dbCurAttr2 >= dbSetAttr2) {
-                        return true;
-                    }
-                } else if (operator.equals(">")) {
-                    if (dbCurAttr2 > dbSetAttr2) {
-                        return true;
-                    }
+                switch (operator) {
+                    case "=":
+                        if (dbCurAttr2 == dbSetAttr2) {
+                            return true;
+                        }
+                        break;
+                    case "!=":
+                        if (dbCurAttr2 != dbSetAttr2) {
+                            return true;
+                        }
+                        break;
+                    case "<=":
+                        if (dbCurAttr2 <= dbSetAttr2) {
+                            return true;
+                        }
+                        break;
+                    case "<":
+                        if (dbCurAttr2 < dbSetAttr2) {
+                            return true;
+                        }
+                        break;
+                    case ">=":
+                        if (dbCurAttr2 >= dbSetAttr2) {
+                            return true;
+                        }
+                        break;
+                    case ">":
+                        if (dbCurAttr2 > dbSetAttr2) {
+                            return true;
+                        }
+                        break;
                 }
             } else {
-                if (operator.equals("=")) {
-                    if (strSetAttr2.equals(strCurAttr2) || (strSetAttr2.equals("存在") && strCurAttr2.length() > 0)) {
-                        return true;
-                    }
-                } else if (operator.equals("!=")) {
-                    if (!strCurAttr2.equals(strSetAttr2)) {
-                        return true;
-                    }
-                } else if (operator.equals("contains")) {
-                    return strCurAttr2.contains(strSetAttr2);
+                switch (operator) {
+                    case "=":
+                        if (strSetAttr2.equals(strCurAttr2) || (strSetAttr2.equals("存在") && strCurAttr2.length() > 0)) {
+                            return true;
+                        }
+                        break;
+                    case "!=":
+                        if (!strCurAttr2.equals(strSetAttr2)) {
+                            return true;
+                        }
+                        break;
+                    case "contains":
+                        return strCurAttr2.contains(strSetAttr2);
                 }
             }
 
@@ -219,15 +282,17 @@ public class FlowRuleRunner extends ProcessLog {
      * @params [verbName, arrayParas, infoMap]
      * @return void
      */
-    public  void doVerb(String verbName, String[] arrayParas, Map<String, String> infoMap) {
+    private  void doVerb(String verbName, String[] arrayParas, Map<String,String> infoMap) {
         if(arrayParas==null)
         {
             arrayParas=new String[]{};
         }
+        BasisVerbs basisVerbs=new BasisVerbs();
         if (verbName.equals("应答")) {
-            BasisVerbs.answer(arrayParas, infoMap);
+            basisVerbs.answer(arrayParas, infoMap);
         }else if(verbName.equals("信息获取")){
-            BasisVerbs.informationRetrieval(arrayParas,infoMap);
+            basisVerbs.informationRetrieval(arrayParas,infoMap);
         }
+        super.addLog(basisVerbs.getLog());
     }
 }

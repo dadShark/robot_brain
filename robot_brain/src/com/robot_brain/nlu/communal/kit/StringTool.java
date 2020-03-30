@@ -70,4 +70,83 @@ public class StringTool {
         }
         return resultList;
     }
+
+    /*
+     * description: 从尾部开始去除相应字符，直到遇见第一个与该字符不等的字符为止
+     * create by: shark
+     * create time: 2020/3/23 14:30
+     * @params [string, charsToTrim]
+     * @return java.lang.String
+     */
+    private static String trimEndCharacter(String str, Character... charsToTrim) {
+        if (str == null || charsToTrim == null)
+            return str;
+
+        int lengthToKeep = str.length();
+        for (int index = str.length() - 1; index >= 0; index--) {
+            boolean removeChar = false;
+            if (charsToTrim.length == 0) {
+                if (Character.isWhitespace(str.charAt(index))) {
+                    lengthToKeep = index;
+                    removeChar = true;
+                }
+            } else {
+                for (Character character : charsToTrim) {
+                    if (str.charAt(index) == character) {
+                        lengthToKeep = index;
+                        removeChar = true;
+                        break;
+                    }
+                }
+            }
+            if (!removeChar)
+                break;
+        }
+        return str.substring(0, lengthToKeep);
+    }
+
+    /*
+     * description: 从首部开始去除相应字符，直到遇见第一个与该字符不等的字符为止
+     * create by: shark
+     * create time: 2020/3/23 14:29
+     * @params [string, charsToTrim]
+     * @return java.lang.String
+     */
+    private static String trimStartCharacter(String str, Character... charsToTrim) {
+        if (str == null || charsToTrim == null)
+            return str;
+
+        int startingIndex = 0;
+        for (int index = 0; index < str.length(); index++) {
+            boolean removeChar = false;
+            if (charsToTrim.length == 0) {
+                if (Character.isWhitespace(str.charAt(index))) {
+                    startingIndex = index + 1;
+                    removeChar = true;
+                }
+            } else {
+                for (Character character : charsToTrim) {
+                    if (str.charAt(index) == character) {
+                        startingIndex = index + 1;
+                        removeChar = true;
+                        break;
+                    }
+                }
+            }
+            if (!removeChar)
+                break;
+        }
+        return str.substring(startingIndex);
+    }
+
+    /*
+     * description: 从两段往中间开始删除指定的字符，直到遇见第一个与该字符不等的字符为止
+     * create by: shark
+     * create time: 2020/3/23 14:28
+     * @params
+     * @return
+     */
+    public static String trimCharacter(String str, Character... charsToTrim) {
+        return trimEndCharacter(trimStartCharacter(str, charsToTrim), charsToTrim);
+    }
 }

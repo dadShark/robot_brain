@@ -3,61 +3,61 @@ package junit.com.robot_brain.nlu.flow.Verbs;
 import com.robot_brain.nlu.flow.Verbs.Extend;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
-/** 
-* Extend Tester. 
-* 
-* @author <Authors name> 
+import static org.junit.Assert.assertEquals;
+
+/**
+* Extend Tester.
+*
+* @author <Authors name>
 * @since <pre>03/17/2020</pre>
-* @version 1.0 
-*/ 
+* @version 1.0
+*/
 public class ExtendTest {
     Extend e=new Extend();
 @Before
-public void before() throws Exception { 
-} 
+public void before() throws Exception {
+}
 
 @After
-public void after() throws Exception { 
-} 
+public void after() throws Exception {
+}
 
-/** 
-* 
-* Method: variablesReplace(String sentence, Map<String, String> infoMap) 
-* 
-*/ 
+/**
+*
+* Method: variablesReplace(String sentence, InfoMap infoMap)
+*
+*/
 @Test
-public void testVariablesReplace() throws Exception { 
-    Map<String,String> infoMap=new HashMap<String,String>();
+public void testVariablesReplace() throws Exception {
+    HashMap<String,String> infoMap=new HashMap<>();
     infoMap.put("省","江苏");
     infoMap.put("市","镇江");
-    infoMap.put("","");
-    ArrayList<String> testStr=new ArrayList<String>();
-    testStr.add("我跟您确认下您的寄件地址是[<@省>省,][<@市>市,][<@区>区,]您可以说是或者不是？");
-    testStr.add("我跟您确认下您的寄件地址是<@省>省,[<@市>市,][<@区>区,]您可以说是或者不是？");
-    testStr.add("我跟您确认下您的寄件地址是<@省>省,<@市>市,<@区>区，您可以说是或者不是？");
-    testStr.add("[<@省>省,]城市：<@市>市,行政区：<@区>区");
+    infoMap.put("区","");
 
-    for(String s:testStr) {
-        System.out.println(e.variablesReplace(s, infoMap));
-    }
+    String testStr1=("我跟您确认下您的寄件地址是[<@省>省,][<@市>市,][<@区>区,]您可以说是或者不是？");
+    String testStr2=("我跟您确认下您的寄件地址是<@省>省,[<@市>市,][<@区>区,]您可以说是或者不是？");
+    String testStr3=("我跟您确认下您的寄件地址是<@省>省,<@市>市,<@区>区，您可以说是或者不是？");
+    String testStr4=("[<@省>省,]城市：<@市>市,行政区：<@区>区");
 
+    assertEquals("我跟您确认下您的寄件地址是江苏省,镇江市,您可以说是或者不是？",e.variablesReplace(testStr1,infoMap));
+    assertEquals("我跟您确认下您的寄件地址是江苏省,镇江市,您可以说是或者不是？",e.variablesReplace(testStr2,infoMap));
+    assertEquals("",e.variablesReplace(testStr3,infoMap));
+    assertEquals("",e.variablesReplace(testStr4,infoMap));
 }
 
 
-/** 
-* 
-* Method: requiredVariablesReplace(String sentence, Map<String, String> infoMap) 
-* 
-*/ 
-@Test
-public void testRequiredVariablesReplace() throws Exception { 
-//TODO: Test goes here... 
+/**
+*
+* Method: requiredVariablesReplace(String sentence, InfoMap infoMap)
+*
+*/
+@Ignore
+public void testRequiredVariablesReplace() throws Exception {
 /* 
 try { 
    Method method = Extend.getClass().getMethod("requiredVariablesReplace", String.class, Map<String,.class); 
@@ -67,7 +67,7 @@ try {
 } catch(IllegalAccessException e) { 
 } catch(InvocationTargetException e) { 
 } 
-*/ 
-} 
+*/
+}
 
 } 

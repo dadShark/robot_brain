@@ -14,7 +14,7 @@ import java.util.Map;
  * @Version V1.0
  **/
 public class Extend extends ProcessLog {
-    public  String variablesReplace(String sentence, Map<String, String> infoMap) {
+    public  String variablesReplace(String sentence, Map<String,String> infoMap) {
         //处理可选变量“[漫游国是<@国家>]”
         if (infoMap.size() == 0) {
             return sentence;
@@ -60,17 +60,14 @@ public class Extend extends ProcessLog {
      * @params [sentence, infoMap]
      * @return java.lang.Boolean
      */
-    private String requiredVariablesReplace(String sentence, Map<String, String> infoMap) {
+    private String requiredVariablesReplace(String sentence, Map<String,String> infoMap) {
         ArrayList<String> willChoose = StringTool.getStringBetweenTag(sentence,
                 "<@", ">");
         if (willChoose.size() == 0) {
             return sentence;//没有找到可替换变量，返回原串
         }
         for (String str : willChoose) {
-            String vStr = "";
-            if (infoMap.containsKey(str)) {
-                vStr = infoMap.get(str);
-            }
+            String vStr = infoMap.getOrDefault(str,"");
             if (vStr.length() == 0
                     && !sentence.contains("允许无参数")) {
                 super.setLogInfo(" 【规则变量替换：】必选项变量替换 \"<@" + str + ">\" 为空");

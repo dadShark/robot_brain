@@ -1,5 +1,7 @@
 package com.robot_brain.nlu.flow.Verbs;
 
+import com.robot_brain.nlu.communal.kit.ProcessLog;
+
 import java.util.Map;
 
 /**
@@ -9,7 +11,7 @@ import java.util.Map;
  * @Date 2020/3/15 16:11
  * @Version V1.0
  **/
-public class BasisVerbs {
+public class BasisVerbs extends ProcessLog {
     /*
      * create by: shark
      * description: TODO 应答
@@ -17,7 +19,7 @@ public class BasisVerbs {
      * @params [arrayParas, infoMap]
      * @return void
      */
-    public static void answer(String[] arrayParas, Map<String, String> infoMap) {
+    public  void answer(String[] arrayParas, Map<String,String> infoMap) {
         //TODO @上文回复
         if (arrayParas.length == 0) {
             return;
@@ -27,11 +29,7 @@ public class BasisVerbs {
             Extend extend=new Extend();
             template=extend.variablesReplace(template,infoMap);
         }
-        if (infoMap.containsKey("answer")) {
-            infoMap.put("answer", infoMap.get("answer") + template);
-        } else {
-            infoMap.put("answer", template);
-        }
+        infoMap.put("answer", template);
     }
 
     /*
@@ -41,7 +39,7 @@ public class BasisVerbs {
      * @params [arrayParas, infoMap]
      * @return void
      */
-    public static void informationRetrieval(String[] arrayParas, Map<String, String> infoMap) {
+    public  void informationRetrieval(String[] arrayParas, Map<String,String> infoMap) {
         if(arrayParas.length==0){
             return;
         }
