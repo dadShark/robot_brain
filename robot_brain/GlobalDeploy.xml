@@ -3,5 +3,7 @@
 <properties>
 
     <entry key="connectFrom">oracle</entry>
+    <entry key="redisurl">oracle</entry>
+
 
 </properties>

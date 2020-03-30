@@ -19,11 +19,6 @@ public class RedisUntil {
 
     }
 
-    public static void main(String[] args) {
-        Jedis jedis =new Jedis("localhost");
-        System.out.println("连接redis成功");
-        System.out.println("服务正在运行"+jedis.ping());
-    }
 
     public static void setOutSideApiReids(Map<String, JSONObject> map) {
         jedisCon();
