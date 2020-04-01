@@ -207,7 +207,6 @@ public class OutsideApiCaller implements StandardModule {
                 //GlobalValue.myLog.error(e);
             }
         }
-        return null;
     }
 
     private String useHttpGET(Map<String, String> outsideApiMaps) {
