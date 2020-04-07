@@ -2,10 +2,7 @@ package com.robot_brain.nlu.flow.bean;
 
 import com.sun.xml.internal.bind.v2.runtime.reflect.Lister;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class OutsideApiInfo {
 
@@ -16,7 +13,7 @@ public class OutsideApiInfo {
      * @Author waterkingko
      * @Date 2020年3月19日 00:35:42
      * @Version V1.0
-     * @deprecated 暂时不用该方法
+
      **/
     private String InterfaceName;//接口名称
     private String Business;//商家
@@ -24,16 +21,20 @@ public class OutsideApiInfo {
     private String CallingMethod;//调用方式（HTTP，WEBSERVICE）
     private String RequestMethod;//（调用方式为http时，为GET、POST；调用方式为webservice时，为函数名称）
     private String NameSpace;//命名空间 调用方式为webservice时填写
-    private List ParseRequestValue;//请求参数 多个参数名称以,连接
-    private List ResponseParameter;//响应参数 多个参数名称以,连接
+    private Map<String,String> ParseRequestValue;//请求参数 多个参数名称以,连接
+    private Map<String,String> ResponseParameter;//响应参数 多个参数名称以,连接
+    private Map<String,String> CallReference;//节点入参
+    private Map<String,String> InterParas;//格式化入参结果
     private String ApplicationID;//应用ID
 
     public OutsideApiInfo() {
         InterfaceName = "";
         Business = "";
-        ParseRequestValue = new LinkedList();
-        ResponseParameter = new LinkedList();
+        ParseRequestValue = new HashMap<String, String>();
+        ResponseParameter = new HashMap<String, String>();
         RequestMethod = "";
+        CallReference=new HashMap<String, String>();
+        InterParas=new HashMap<String, String>();
     }
 
     public OutsideApiInfo(OutsideApiInfo apiInfo) {
@@ -50,6 +51,8 @@ public class OutsideApiInfo {
             this.ParseRequestValue = apiInfo.ParseRequestValue;
             this.ResponseParameter = apiInfo.ResponseParameter;
             this.ApplicationID = apiInfo.ApplicationID;
+            this.CallReference =apiInfo.CallReference;
+            this.InterParas = apiInfo.InterParas;
 
         } catch (Exception e) {
             System.out.println("获取第三方接口配置出错");
@@ -104,19 +107,19 @@ public class OutsideApiInfo {
         this.NameSpace = nameSpace;
     }
 
-    public List getParseRequestValue() {
+    public Map<String, String> getParseRequestValue() {
         return ParseRequestValue;
     }
 
-    public void setParseRequestValue(List parseRequestValue) {
+    public void setParseRequestValue(Map parseRequestValue) {
         this.ParseRequestValue = parseRequestValue;
     }
 
-    public List getResponseParameter() {
+    public Map<String, String> getResponseParameter() {
         return ResponseParameter;
     }
 
-    public void setResponseParameter(List responseParameter) {
+    public void setResponseParameter(Map responseParameter) {
         this.ResponseParameter = responseParameter;
     }
 
@@ -126,6 +129,36 @@ public class OutsideApiInfo {
 
     public void setApplicationID(String applicationID) {
         this.ApplicationID = applicationID;
+    }
+
+    public Map<String, String> getCallReference() {
+        return CallReference;
+    }
+
+    public void setCallReference(Map<String, String> callReference) {
+        CallReference = callReference;
+    }
+
+    public Map<String, String> getInterParas() {
+        return InterParas;
+    }
+
+    public void setInterParas(Map<String, String> interParas) {
+        InterParas = interParas;
+    }
+
+    public void formatInParas(Map<String, String> requestvalue, Map<String, String> maps) {
+
+        Map<String,String> inparas = new HashMap<String, String>();
+        for (String key:requestvalue.keySet()) {
+            String value =requestvalue.get(key);
+            if (maps.containsKey(value)){
+                String v= maps.get(value);
+                inparas.put(key,v);
+            }
+        }
+        setInterParas(inparas);
+
     }
 /*       key:测试行业->测试商家->测试应用::测试接口
             value:

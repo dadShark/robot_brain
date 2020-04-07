@@ -6,8 +6,5 @@ import static org.junit.Assert.*;
 
 public class OutsideApiDAOTest {
 
-    @Test
-    public void select() {
 
-    }
 }
