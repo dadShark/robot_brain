@@ -80,8 +80,7 @@ try {
 * 
 */ 
 @Ignore
-public void testIsTrue() throws Exception { 
-//TODO: Test goes here... 
+public void testIsTrue() throws Exception {
 /* 
 try { 
    Method method = FlowRuleRunner.getClass().getMethod("isTrue", String.class, String.class, String.class, Map<String,.class); 

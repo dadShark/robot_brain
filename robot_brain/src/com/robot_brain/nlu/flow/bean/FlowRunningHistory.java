@@ -1,6 +1,6 @@
 package com.robot_brain.nlu.flow.bean;
 
-import org.jetbrains.annotations.NotNull;
+import com.sun.istack.internal.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,7 +33,9 @@ public class FlowRunningHistory {
     }
 
     public FlowRunningHistory(@NotNull Map<String, String> _infoMap) {
-
+        for (String key : _infoMap.keySet()) {
+            infoMap.put(key, _infoMap.get(key));
+        }
         flowName = infoMap.getOrDefault("流程名称", "");
         flowID = infoMap.getOrDefault("流程ID", "");
         nodeNum = infoMap.getOrDefault("当前节点名", "");
@@ -44,9 +46,6 @@ public class FlowRunningHistory {
         } catch (Exception e) {
             isEndNode = true;
             //TODO 记录错误日志
-        }
-        for (String key : _infoMap.keySet()) {
-            infoMap.put(key, _infoMap.get(key));
         }
     }
 

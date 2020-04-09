@@ -17,7 +17,8 @@ import java.util.Map;
  **/
 public class FlowRuleRunner extends ProcessLog {
 
-    public Boolean runRule(String rule, Map<String,String> infoMap) {
+    public Boolean runRule(String rule, Map<String, String> infoMap) {
+        this.setLogDebug("开始执行规则："+rule);
         //规则解析
         String conditions = "";
         String actions;
@@ -77,7 +78,7 @@ public class FlowRuleRunner extends ProcessLog {
                 String attr1 = condition.substring(0, tag).trim();
                 String attr2 = condition.substring(tag + operator.length()).trim();
                 //去除条件值中的双引号，不用做判断值类型（字符串或数值）的依据
-                attr2=attr2.replace("\"","");
+                attr2 = attr2.replace("\"", "");
                 //进行条件判断
                 if (isTrue(attr1, operator, attr2, infoMap)) {
                     continue;
@@ -90,9 +91,9 @@ public class FlowRuleRunner extends ProcessLog {
         }
 
         //动作执行
-        super.setLogInfo("执行规则："+rule);
+        super.setLogInfo("执行规则：" + rule);
         //解析动作
-        ArrayList<String> actionsList=new ArrayList<>();
+        ArrayList<String> actionsList = new ArrayList<>();
         if (actions.contains(");")) {
             // 用字符位置进行字符串切割
             int length = actions.length();
@@ -113,32 +114,32 @@ public class FlowRuleRunner extends ProcessLog {
         } else {
             actionsList.add(actions.trim());
         }
-        for(String verb:actionsList){
-            int front=verb.indexOf("(");
-            int last=verb.lastIndexOf(")");
+        for (String verb : actionsList) {
+            int front = verb.indexOf("(");
+            int last = verb.lastIndexOf(")");
             //动作名称
             String verbName;
             //执行参数
             String[] arrayParas;
-            if(front==-1){
+            if (front == -1) {
                 //默认缺省的动作名称为"应答"
-                verbName="应答";
-                arrayParas=new String[]{verb};
-            }else {
+                verbName = "应答";
+                arrayParas = new String[]{verb};
+            } else {
                 verbName = verb.substring(0, front).trim();
                 arrayParas = verb.substring(front + 1, last).trim().split("\",\"");
             }
-            int length=arrayParas.length;
-            if(length>0){
+            int length = arrayParas.length;
+            if (length > 0) {
                 //去除前后遗留的引号
-                arrayParas[0]=StringTool.trimCharacter(arrayParas[0],'\"');
-                arrayParas[length-1]=StringTool.trimCharacter(arrayParas[length-1],'\"');
+                arrayParas[0] = StringTool.trimCharacter(arrayParas[0], '\"');
+                arrayParas[length - 1] = StringTool.trimCharacter(arrayParas[length - 1], '\"');
             }
-            String answer=infoMap.getOrDefault("answer","");
-            doVerb(verbName,arrayParas,infoMap);
-            if(answer.length()>0 && !answer.equals(infoMap.getOrDefault("answer",""))){
+            String answer = infoMap.getOrDefault("answer", "");
+            doVerb(verbName, arrayParas, infoMap);
+            if (answer.length() > 0 && !answer.equals(infoMap.getOrDefault("answer", ""))) {
                 //当同一条规则的多组动作对答案进行操作时，默认直接进行答案拼接
-                infoMap.put("answer",answer+infoMap.getOrDefault("answer",""));
+                infoMap.put("answer", answer + infoMap.getOrDefault("answer", ""));
             }
         }
         return true;
@@ -151,7 +152,7 @@ public class FlowRuleRunner extends ProcessLog {
      * @params [attr1, operator, attr2, infoMap]
      * @return java.lang.Boolean
      */
-    private Boolean isTrue(String attr1, String operator, String attr2, Map<String,String> infoMap) {
+    private Boolean isTrue(String attr1, String operator, String attr2, Map<String, String> infoMap) {
         String[] arrayAttr2;
         if (attr2.contains("||")) {
             //多个值视为or的关系，一个为true，整个表达式为true
@@ -188,7 +189,7 @@ public class FlowRuleRunner extends ProcessLog {
                     op = "/";
                 }
                 if (infoMap.containsKey(tmp)) {
-                    tmp = infoMap.getOrDefault(tmp,"");
+                    tmp = infoMap.getOrDefault(tmp, "");
                 }
                 if (StringTool.isArabicNumerals(tmp) && StringTool.isArabicNumerals(value) && StringTool.isArabicNumerals(attr2)) {
                     if (op.equals("%")) {
@@ -207,11 +208,11 @@ public class FlowRuleRunner extends ProcessLog {
                 //attr1非算式的情况，需要从infoMap中取值，并判断此次是数值运算还是字符运算
                 if (infoMap.containsKey(attr1)) {
                     //当前值获取完毕，默认是String
-                    strCurAttr2 = infoMap.getOrDefault(attr1,"");
+                    strCurAttr2 = infoMap.getOrDefault(attr1, "");
                 }
                 if (strSetAttr2.startsWith("@") && infoMap.containsKey(strSetAttr2)) {
                     //出发地=@目的地
-                    strSetAttr2 = infoMap.getOrDefault(strSetAttr2,"");
+                    strSetAttr2 = infoMap.getOrDefault(strSetAttr2, "");
                 }
                 if (StringTool.isArabicNumerals(strCurAttr2) && StringTool.isArabicNumerals(strSetAttr2)) {
                     //如果设定值和当前值都是数值，则此次是数值运算
@@ -282,16 +283,36 @@ public class FlowRuleRunner extends ProcessLog {
      * @params [verbName, arrayParas, infoMap]
      * @return void
      */
-    private  void doVerb(String verbName, String[] arrayParas, Map<String,String> infoMap) {
-        if(arrayParas==null)
-        {
-            arrayParas=new String[]{};
+    private void doVerb(String verbName, String[] arrayParas, Map<String, String> infoMap) {
+        if (arrayParas == null) {
+            arrayParas = new String[]{};
         }
-        BasisVerbs basisVerbs=new BasisVerbs();
-        if (verbName.equals("应答")) {
-            basisVerbs.answer(arrayParas, infoMap);
-        }else if(verbName.equals("信息获取")){
-            basisVerbs.informationRetrieval(arrayParas,infoMap);
+        BasisVerbs basisVerbs = new BasisVerbs();
+        switch (verbName) {
+            case "应答":
+                basisVerbs.answer(arrayParas, infoMap);
+                break;
+            case "信息获取":
+                basisVerbs.informationRetrieval(arrayParas, infoMap);
+                break;
+            case "新增":
+                basisVerbs.setInfo(arrayParas,infoMap);
+                break;
+            case "节点跳转":
+                basisVerbs.next(arrayParas,infoMap);
+                break;
+            case "流程跳转":
+                basisVerbs.nextFlow(arrayParas, infoMap);
+                break;
+            case "提供选单":
+                basisVerbs.offerMenu(arrayParas, infoMap);
+                break;
+            case "结束会话":
+                basisVerbs.endDialog(arrayParas, infoMap);
+                break;
+            case "结束流程":
+                basisVerbs.endFlow(arrayParas, infoMap);
+                break;
         }
         super.addLog(basisVerbs.getLog());
     }

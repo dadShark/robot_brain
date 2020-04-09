@@ -5,7 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.robot_brain.nlu.communal.kit.ProcessLog;
 import com.robot_brain.nlu.flow.bean.FlowRunningHistory;
 import com.robot_brain.nlu.flow.temp.SaveLikeRedis;
-import org.jetbrains.annotations.NotNull;
+import com.sun.istack.internal.NotNull;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -29,9 +29,9 @@ public class FlowController extends ProcessLog {
             this.setLogInfo("场景：" + flowName + "不存在");
             infoMap.put("无效流程名称", flowName);
             infoMap.remove("流程名称");
-            //TODO:根据中心问题检索需要进入的流程
+            //TODO:根据流程执行历史信息，进入流程
             if (flowID.equals("NULL")) {
-                //TODO:根据流程执行历史信息，进入流程
+                //TODO:根据中心问题检索需要进入的流程
             }
         }
         if (flowID.equals("NULL")) {
@@ -48,42 +48,49 @@ public class FlowController extends ProcessLog {
             nodeNum = history.getNodeNum();
         }
         //开始执行流程
-        boolean flowBreak = false;
-        FlowRuleRunner runner = new FlowRuleRunner();
+        boolean go = true;
         //初始化流程信息
         infoMap.put("当前节点名", nodeNum);
         infoMap.put("流程名称", flowName);
         infoMap.put("流程ID", flowID);
-        while (!flowBreak) {
-            //记录是否有规则已执行
-            boolean isRun = false;
-            //加载节点规则
+        //流程状态，取值有两种：break（跳出流程）,goto（进行节点跳转或流程跳转）
+        String flowState = "";
+        while (go) {
+            FlowRuleRunner runner = new FlowRuleRunner();
+            //加载并执行节点规则
             for (String rule : loadNodeRules(flowID, nodeNum)) {
+                //当节点规则遍历完成之后结束循环，或者当规则要求break时结束循环。
                 if (runner.runRule(rule, infoMap)) {
-                    isRun = true;
-                    infoMap.put("结束规则",rule);
-                    String _nodeNum = infoMap.getOrDefault("当前节点名", "");
-                    String _flowID = infoMap.getOrDefault("流程ID", "");
-                    if (nodeNum.equals("break")) {
-                        flowBreak = true;
-                        break;
-                    }
-                    if (!_nodeNum.equals(nodeNum) || _flowID.equals(flowID)) {
-                        //节点号或者流程ID发生改变，终止本节点的规则执行，进入下一个节点或流程
-                        nodeNum = _nodeNum;
-                        flowID = _flowID;
+                    infoMap.put("结束规则", rule);
+                    flowState = infoMap.getOrDefault("flowState", "");
+                    if (flowState.equals("break") || flowState.equals("goto")) {
                         break;
                     }
                 }
             }
-            if (!isRun) {
-                this.setLogInfo("无满足条件的规则可以执行，终止流程");
-                //跳出，防止死循环。
-                break;
+            //获取执行日志
+            this.addLog(runner.getLog());
+            switch (flowState) {
+                case "break":
+                    //流程终止信号
+                    go = false;
+                    break;
+                case "goto":
+                    //流程跳转信号
+                    go = true;
+                    flowID = infoMap.getOrDefault("流程ID", "");
+                    nodeNum = infoMap.getOrDefault("当前节点名", "");
+                    break;
+                default:
+                    //无信号时，为了防止死循环，默认终止流程
+                    go = false;
+                    this.setLogInfo("规则存在异常，无终止信号和跳转信号，系统强制终止");
+                    break;
             }
+            //去除状态值，以免影响下次执行
+            infoMap.remove("flowState");
+            flowState="";
         }
-        //获取执行日志
-        this.setLogInfo(runner.getLog());
         //将流程执行的情况，记录进流程历史记录中
         FlowRunningHistory flowRunningHistory = new FlowRunningHistory(infoMap);
         saveFlowHistory(dialogID, flowRunningHistory);
