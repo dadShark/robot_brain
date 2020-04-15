@@ -22,6 +22,8 @@ public class FlowTry {
             System.out.println("第" + i + "轮对话");
             i++;
             System.out.println("请按照格式输入信息(key1=value1 key2=value2)，结束流程请输入end：");
+            //输入信息：流程名称=入口：询问用户类型
+            //输入信息2：用户类型=个人
             Scanner reader = new Scanner(System.in);
             String input = reader.nextLine();
             if (input.equalsIgnoreCase("END")) {
