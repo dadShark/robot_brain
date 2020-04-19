@@ -21,6 +21,8 @@ public class OutsideApiCallerTest {
         maps.put("funcation","3");
         maps.put("ETC卡号","ETC001");
         maps.put("日期","2020年4月6日");
+        maps.put("信息获取","查询个人名下车牌号");
+        maps.put("商家ID","10001");
         OutsideApiCaller outsideApiCaller =new OutsideApiCaller();
         System.out.println(outsideApiCaller._main_(maps));
     }

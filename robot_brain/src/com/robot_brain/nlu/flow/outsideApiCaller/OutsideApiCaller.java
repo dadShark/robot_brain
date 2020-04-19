@@ -96,30 +96,47 @@ public class OutsideApiCaller implements StandardModule {
     }
 
 
-    public Map<String,String> _main_(Map<String,String> maps) {
+    public String _main_(Map<String,String> maps) {
         Map<String,String> result= null;
+        String rlt="";
         //从maps中获获取商家和应用
-        String apiname = maps.get("InterfaceName");
-        String businessid = maps.get("ApplicationID");
+        String apiname = maps.get("信息获取");
+        String businessid = maps.get("商家ID");
         //合成key
         String mkey =businessid+"::"+apiname;
         //从redis中将第三方接口信息全部读取出来
         Map<String,String> getRedisConfig = RedisUntil.getOutSideApiRedis("config:outsidApiInfo");
+
         //通过key将对应商家的对应第三方接口信息读取出来
         String mvalue = getRedisConfig.getOrDefault(mkey,null);
         try{
             //反序列化为OutsideApiInfo数据结构
             JSONObject objects = JSON.parseObject(mvalue);
-
-            OutsideApiInfo outsideApiMaps = JSON.toJavaObject(objects,OutsideApiInfo.class);
+            //将数据结构转成javaBean结构
+             OutsideApiInfo outsideApiMaps = JSON.toJavaObject(objects,OutsideApiInfo.class);
             //将map中的数据通过请求参数信息ParseRequestValue读取成对应的key与value的map存入格式化入参结果InterParas中;
-
             Map<String,String> requestValue =outsideApiMaps.getParseRequestValue();
+            Map<String,String> responseParameter =outsideApiMaps.getResponseParameter();
             outsideApiMaps.formatInParas(requestValue,maps);
             if (result == null&&outsideApiMaps.getCallingMethod().equals("HTTP")){
                 if (outsideApiMaps.getRequestMethod().equals("GET")){
                     result = useHttpGET(outsideApiMaps);
-                    return result;
+                    if (result!=null){
+                        for (String rs:result.keySet()){
+                            //{"car_id":"","car_id_num":"0"}
+                            String value=result.getOrDefault(rs,"空");
+                            if (responseParameter.containsKey(rs)){
+                                String rekey = responseParameter.getOrDefault(rs,"无");
+                                maps.put(rekey,value);
+                                if (value!=""){
+                                    rlt+=rekey+"为"+value+".";
+                                }else{
+                                    rlt+=rekey+"为无.";
+                                }
+
+                            }
+                        }
+                    }
                 }
 //                if (outsideApiMaps.getRequestMethod().equals("POST")){
 //                    result = useHttpPost(outsideApiMaps);
@@ -132,6 +149,7 @@ public class OutsideApiCaller implements StandardModule {
 //                return result;
 //
 //            }
+
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -147,7 +165,7 @@ public class OutsideApiCaller implements StandardModule {
 
         //根据第三方配置名从redis中将json串取出到map中
         //判断map中元素invocation_way判断使用哪种解析接口方式HTTP，WEBSERVICE
-        return result;
+        return rlt;
     }
 
 
@@ -166,9 +184,10 @@ public class OutsideApiCaller implements StandardModule {
         if (json != null && json.length() > 0) {
             JSONObject obj = JSON.parseObject(json);
             resMap =JSON.toJavaObject(obj,Map.class);
+            return resMap;
+        }else {
+            return resMap;
         }
-        return resMap;
-
     }
 
     private Map<String, String> useHttpPost(OutsideApiInfo outsideApiMaps) {

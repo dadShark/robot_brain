@@ -1,6 +1,8 @@
 package com.robot_brain.nlu.flow.Verbs;
 
 import com.robot_brain.nlu.communal.kit.ProcessLog;
+import com.robot_brain.nlu.communal.myInterface.StandardModule;
+import com.robot_brain.nlu.flow.outsideApiCaller.OutsideApiCaller;
 import com.robot_brain.nlu.flow.temp.SaveLikeRedis;
 
 import java.util.Map;
@@ -45,8 +47,37 @@ public class BasisVerbs extends ProcessLog {
             return;
         }
         String name = arrayParas[0];
+        infoMap.put("信息获取",name);
 //        TODO 调用外部API
-        infoMap.put("结果", name);
+        if (infoMap.containsKey("用户类型")){
+            switch (infoMap.get("用户类型")){
+                case "个人":
+                    infoMap.put("用户类型","0");
+                    break;
+                case "单位":
+                    infoMap.put("用户类型","1");
+                    break;
+            }
+
+        }
+        if (infoMap.containsKey("信息获取")){
+            switch (infoMap.get("信息获取")){
+                case "查询个人名下车牌号":
+                    infoMap.put("funcation","1");
+                    break;
+                case "查询车牌对应的ETC卡号":
+                    infoMap.put("funcation","2");
+                    break;
+                case "查询通行明细":
+                    infoMap.put("funcation","3");
+                    break;
+            }
+
+        }
+        OutsideApiCaller outsideApiCaller =new OutsideApiCaller();
+        //name = StandardModule._main_(infoMap).toString();
+        name=outsideApiCaller._main_(infoMap);
+        infoMap.put("answer", name);
     }
 
     /*
