@@ -109,7 +109,7 @@ public class OutsideApiCaller implements StandardModule {
                 case "查询个人名下车牌号":
                     maps.put("funcation","1");
                     break;
-                case "查询车牌对应的ETC卡号":
+                case "查询车牌号名下的ETC卡":
                     maps.put("funcation","2");
                     break;
                 case "查询通行明细":
