@@ -26,7 +26,10 @@ public class FlowTry {
             //输入信息：流程名称=入口：询问用户类型
             //输入信息2：用户类型=个人
             //开户姓名=张四 身份证号=341121199012120002
+            //
             //车牌号=沪L12313
+            //确认ETC卡号=是
+            //查询日期=2020年4月6日
             Scanner reader = new Scanner(System.in);
             String input = reader.nextLine();
             if (input.equalsIgnoreCase("END")) {

@@ -101,6 +101,17 @@ public class OutsideApiCaller implements StandardModule {
         String rlt="";
         //从maps中获获取商家和应用
         String apiname = maps.get("信息获取");
+        if (maps.containsKey("用户类型")){
+            switch (maps.get("用户类型")){
+                case "个人":
+                    maps.put("用户类型","0");
+                    break;
+                case "单位":
+                    maps.put("用户类型","1");
+                    break;
+            }
+
+        }
         if(apiname.equals("查询单位名下车牌号")){
             apiname="查询个人名下车牌号";
         }
@@ -109,7 +120,7 @@ public class OutsideApiCaller implements StandardModule {
                 case "查询个人名下车牌号":
                     maps.put("funcation","1");
                     break;
-                case "查询车牌号名下的ETC卡":
+                case "查询车牌对应的ETC卡号":
                     maps.put("funcation","2");
                     break;
                 case "查询通行明细":

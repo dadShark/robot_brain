@@ -49,22 +49,12 @@ public class BasisVerbs extends ProcessLog {
         String name = arrayParas[0];
         infoMap.put("信息获取",name);
 //        TODO 调用外部API
-        if (infoMap.containsKey("用户类型")){
-            switch (infoMap.get("用户类型")){
-                case "个人":
-                    infoMap.put("用户类型","0");
-                    break;
-                case "单位":
-                    infoMap.put("用户类型","1");
-                    break;
-            }
 
-        }
 
         OutsideApiCaller outsideApiCaller =new OutsideApiCaller();
         //name = StandardModule._main_(infoMap).toString();
         name=outsideApiCaller._main_(infoMap);
-        infoMap.put("answer", name);
+        infoMap.put("历史记录", name);
     }
 
     /*
