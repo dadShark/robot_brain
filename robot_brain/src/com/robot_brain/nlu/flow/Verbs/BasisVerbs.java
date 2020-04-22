@@ -60,20 +60,7 @@ public class BasisVerbs extends ProcessLog {
             }
 
         }
-        if (infoMap.containsKey("信息获取")){
-            switch (infoMap.get("信息获取")){
-                case "查询个人名下车牌号":
-                    infoMap.put("funcation","1");
-                    break;
-                case "查询车牌对应的ETC卡号":
-                    infoMap.put("funcation","2");
-                    break;
-                case "查询通行明细":
-                    infoMap.put("funcation","3");
-                    break;
-            }
 
-        }
         OutsideApiCaller outsideApiCaller =new OutsideApiCaller();
         //name = StandardModule._main_(infoMap).toString();
         name=outsideApiCaller._main_(infoMap);

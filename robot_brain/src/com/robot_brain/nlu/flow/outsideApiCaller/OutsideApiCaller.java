@@ -101,6 +101,26 @@ public class OutsideApiCaller implements StandardModule {
         String rlt="";
         //从maps中获获取商家和应用
         String apiname = maps.get("信息获取");
+        if(apiname.equals("查询单位名下车牌号")){
+            apiname="查询个人名下车牌号";
+        }
+        if (maps.containsKey("信息获取")){
+            switch (maps.get("信息获取")){
+                case "查询个人名下车牌号":
+                    maps.put("funcation","1");
+                    break;
+                case "查询车牌对应的ETC卡号":
+                    maps.put("funcation","2");
+                    break;
+                case "查询通行明细":
+                    maps.put("funcation","3");
+                    break;
+                case "查询单位名下车牌号":
+                    maps.put("funcation","1");
+                    break;
+            }
+
+        }
         String businessid = maps.get("商家ID");
         //合成key
         String mkey =businessid+"::"+apiname;
@@ -171,7 +191,7 @@ public class OutsideApiCaller implements StandardModule {
 
     private Map<String, String> useHttpGET(OutsideApiInfo outsideApiMaps) {
         // http://km.knowology.cn:8082/CommonDataCount/CDC?params={"用户反馈":"未解决","联系方式":"手机号","地市":"","姓名":"zch","用户id":"A47F3BBDC38D0A417F409D336A8B6F9D","省份":"","反馈内容":"sssss","评论时间":"2019/01/28 30:08:05","对话id":"A47F3BBDC38D0A417F409D336A8B6F9D","用户咨询":"赎回到账时间","联系号码":"18362218921","业务渠道":"Web","商家":"证券行业->东方证券->多渠道应用"}
-        Map<String, String> resMap = new HashMap<String, String>();
+        //Map<String, String> resMap = new HashMap<String, String>();
         String url = outsideApiMaps.getInterfaceAddress() + "?";
         Map<String,String> params = outsideApiMaps.getInterParas();
 
@@ -180,12 +200,16 @@ public class OutsideApiCaller implements StandardModule {
             url +=key+"="+params.get(key)+"&";
         }
         url = url.substring(0,url.length()-1);
-        String json = HTTPUntil.get(url);
+        String json = HTTPUntil.get(url).replace("\n","");
         if (json != null && json.length() > 0) {
             JSONObject obj = JSON.parseObject(json);
-            resMap =JSON.toJavaObject(obj,Map.class);
+
+            //resMap= (Map<String, String>)JSONObject.parse(json);
+            Map<String, String> resMap =JSON.toJavaObject(obj,Map.class);
             return resMap;
         }else {
+            Map<String, String> resMap = new HashMap<String, String>();
+            resMap.put("结果","无");
             return resMap;
         }
     }
